@@ -103,21 +103,34 @@ if __name__ == '__main__':
     fr = FaceRecognition()
     fr.encode_faces()
 
-    # Specify the URL of the image on your PythonAnywhere web app
-    image_url = 'https://mypresence.pythonanywhere.com/home/mypresence/mysite/front/mike.jpg'
+    # Specify the URL of the JSON response on your PythonAnywhere web app
+    json_url = 'https://mypresences.pythonanywhere.com/get_image_url'
 
-    # Send a GET request to download the image
-    response = requests.get(image_url)
-
+    # Send a GET request to retrieve the JSON response
+    response = requests.get(json_url)
 
     # Check if the request was successful (status code 200)
     if response.status_code == 200:
-        # Save the image locally
-        with open('image2.jpg', 'wb') as file:
-            file.write(response.content)
-        print('Image downloaded successfully.')
+        # Parse the JSON response
+        json_response = response.json()
+
+        # Extract the image URL from the JSON response
+        image_url = json_response['image_url']
+        print(f"Image URL: {image_url}")
+
+        # Download the image using the extracted URL
+        image_response = requests.get(image_url)
+
+        # Check if the image download request was successful (status code 200)
+        if image_response.status_code == 200:
+            # Save the image locally
+            with open('image2.jpg', 'wb') as file:
+                file.write(image_response.content)
+            print('Image downloaded successfully.')
+        else:
+            print('Failed to download the image.')
     else:
-        print('Failed to download the image.')
+        print('Failed to retrieve the JSON response.')
 
     image_path = 'image2.jpg'
     fr.run_recognition(image_path)
